@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-
-import { DateRangePicker } from "react-date-range";
+import format from "date-fns/format";
+import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 
@@ -10,6 +10,10 @@ function App() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [allProducts, setAllProducts] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  // get the target element to toggle
+  const refOne = useRef(null);
 
   useEffect(() => {
     axios
@@ -18,6 +22,10 @@ function App() {
         setProducts(response.data);
         setAllProducts(response.data);
       });
+
+    // event listeners
+    document.addEventListener("keydown", hideOnEscape, true);
+    document.addEventListener("click", hideOnClickOutside, true);
   }, []);
 
   const handleSelect = (date) => {
@@ -38,10 +46,46 @@ function App() {
     endDate: endDate,
     key: "selection",
   };
+
+  // hide dropdown on ESC press
+  const hideOnEscape = (e) => {
+    // console.log(e.key)
+    if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
+  // Hide on outside click
+  const hideOnClickOutside = (e) => {
+    // console.log(refOne.current)
+    // console.log(e.target)
+    if (refOne.current && !refOne.current.contains(e.target)) {
+      setOpen(false);
+    }
+  };
+
   return (
     <div className="App">
       <header className="App-header">
-        <DateRangePicker ranges={[selectionRange]} onChange={handleSelect} />
+        <input
+          value={`${format(startDate, "MM/dd/yyyy")} to ${format(
+            endDate,
+            "MM/dd/yyyy"
+          )}`}
+          type="text"
+          onClick={() => setOpen((open) => !open)}
+        />
+        <div ref={refOne}>
+          {open && (
+            <DateRange
+              ranges={[selectionRange]}
+              onChange={handleSelect}
+              editableDateInputs={true}
+              moveRangeOnFirstSelection={false}
+            />
+          )}
+        </div>
+
         <table>
           <thead>
             <tr>
