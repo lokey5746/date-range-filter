@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import "./App.css";
 import format from "date-fns/format";
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
@@ -66,7 +67,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header className="calendarWrap">
         <input
           value={`${format(startDate, "MM/dd/yyyy")} to ${format(
             endDate,
